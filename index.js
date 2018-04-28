@@ -3,6 +3,27 @@ const barNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
 // Placeholder data
 const data = barNames.map(el => 1);
 
+const trumpImageWidth = 30;
+const trumpImageHeight = 39;
+
+const transitions = [
+  {
+    start: 0,
+    end: 2,
+    topic: 0,
+  },
+  {
+    start: 2,
+    end: 4,
+    topic: 1,
+  },
+  {
+    start: 4,
+    end: 10,
+    topic: 2,
+  },
+];
+
 const margin = {
   top: 50,
   right: 50,
@@ -33,12 +54,12 @@ const bars = chartGroup
   .append('rect')
   .classed('bar', true);
 
-// Add circles!
-const circles = chartGroup
-  .selectAll('circle')
+// Add images!
+const images = chartGroup
+  .selectAll('image')
   .data(data)
   .enter()
-  .append('circle');
+  .append('image');
 
 function renderChart(width) {
   const height = width;
@@ -68,16 +89,32 @@ function renderChart(width) {
     .attr('y', 0);
 
   // Give our circle some attributes
-  const circleAttrs = circles
-    .attr('cx', (d, i) => xScale(barNames[i]))
-    .attr('cy', 0)
-    .attr('r', 30)
-    .attr('fill', 'red')
-    .attr('fill-opacity', (d, i) => (i === 0 ? 1 : 0))
-    .transition()
-    .ease(d3.easeLinear)
-    .duration(1000 * numSeconds)
-    .attr('cy', chartHeight);
+  const imageAttrs = images
+    .attr('x', (d, i) => xScale(barNames[i]))
+    .attr('y', 0)
+    .attr('xlink:href', 'trump.jpg')
+    .attr('width', trumpImageWidth)
+    .attr('height', trumpImageHeight)
+    .attr('opacity', 0);
+
+  function runTransitions(transitionArray, transitionIndex) {
+    // Continue running transitions until we hit our termination
+    // condition (we reach the end of our transitions array)
+    if (transitionIndex >= transitionArray.length) {
+      return;
+    }
+
+    const t = transitionArray[transitionIndex];
+    imageAttrs
+      .attr('opacity', (d, i) => (i === t.topic ? 1 : 0))
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(1000 * (t.end - t.start))
+      .attr('y', chartHeight - yScale(t.end))
+      .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
+  }
+
+  runTransitions(transitions, 0);
 }
 
 // Render chart once, the first time we load the page,
