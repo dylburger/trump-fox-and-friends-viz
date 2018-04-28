@@ -46,14 +46,6 @@ xAxis = d3.axisBottom(xScale);
 yAxisGroup = chartGroup.append('g');
 xAxisGroup = chartGroup.append('g');
 
-// We want to trace the path Trump takes from
-// topic to topic. Given our transitions, we can generate
-// an array of (x, y) coordinates traced by those
-// transitions
-
-// Then, generate a line function that draws
-// the path
-
 const bars = chartGroup
   .append('g')
   .selectAll('rect')
@@ -61,13 +53,6 @@ const bars = chartGroup
   .enter()
   .append('rect')
   .classed('bar', true);
-
-// Add images!
-const images = chartGroup
-  .selectAll('image')
-  .data(data)
-  .enter()
-  .append('image');
 
 function renderChart(width) {
   const height = width;
@@ -96,10 +81,35 @@ function renderChart(width) {
     .attr('x', (d, i) => xScale(barNames[i]))
     .attr('y', 0);
 
+  // Then, generate a line function that will draw our path
+  const lineFunc = d3
+    .line()
+    .x(d => d.x)
+    .y(d => d.y);
+
+  // Generate an emtpy path that we'll write
+  // to below
+  const path = chartGroup
+    .append('path')
+    .attr('stroke', 'blue')
+    .attr('stroke-width', lineWidth)
+    .attr('fill', 'none');
+
+  // Also generate an empty set of path points
+  // through which we'll trace our path
+  const pathPoints = [];
+
+  // Add images!
+  const images = chartGroup
+    .selectAll('image')
+    .data(data)
+    .enter()
+    .append('image');
+
   // Give our circle some attributes
   const imageAttrs = images
     .attr('x', (d, i) => xScale(barNames[i]) - trumpImageWidth / 2)
-    .attr('y', 0)
+    .attr('y', -(trumpImageHeight / 2))
     .attr('xlink:href', 'trump.jpg')
     .attr('width', trumpImageWidth)
     .attr('height', trumpImageHeight)
@@ -118,8 +128,31 @@ function renderChart(width) {
       .transition()
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - t.start))
-      .attr('y', chartHeight - yScale(t.end))
+      .attr('y', chartHeight - yScale(t.end) - trumpImageHeight / 2);
+
+    // We want to trace the path Trump takes from
+    // topic to topic. Given our transitions, we can generate
+    // (x, y) coordinates traced by those
+    // transitions
+    const startPoint = {
+      x: xScale(barNames[t.topic]),
+      y: chartHeight - yScale(t.start),
+    };
+    const endPoint = {
+      x: xScale(barNames[t.topic]),
+      y: chartHeight - yScale(t.end),
+    };
+
+    path
+      .attr('d', lineFunc(pathPoints.concat(startPoint)))
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(1000 * (t.end - t.start))
+      .attr('d', lineFunc(pathPoints.concat(startPoint).concat(endPoint)))
       .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
+
+    pathPoints.push(startPoint);
+    pathPoints.push(endPoint);
   }
 
   runTransitions(transitions, 0);
