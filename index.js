@@ -46,6 +46,14 @@ xAxis = d3.axisBottom(xScale);
 yAxisGroup = chartGroup.append('g');
 xAxisGroup = chartGroup.append('g');
 
+// We want to trace the path Trump takes from
+// topic to topic. Given our transitions, we can generate
+// an array of (x, y) coordinates traced by those
+// transitions
+
+// Then, generate a line function that draws
+// the path
+
 const bars = chartGroup
   .append('g')
   .selectAll('rect')
@@ -90,7 +98,7 @@ function renderChart(width) {
 
   // Give our circle some attributes
   const imageAttrs = images
-    .attr('x', (d, i) => xScale(barNames[i]))
+    .attr('x', (d, i) => xScale(barNames[i]) - trumpImageWidth / 2)
     .attr('y', 0)
     .attr('xlink:href', 'trump.jpg')
     .attr('width', trumpImageWidth)
