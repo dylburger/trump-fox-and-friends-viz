@@ -129,6 +129,36 @@ function renderChart(width) {
       .attr('stroke-dashoffset', lineHeight);
   });
 
+  // We must also draw lines from the end of one state to the start
+  // of another, to close the path
+  const linesBetweenTopics = [];
+  for (i = 0; i < transitions.length - 1; i++) {
+    t = transitions[i];
+
+    // Get the (x, y) coordinates of the end of the current state,
+    // and the (x, y) coordinates of the start of the next state
+    const pathPoints = [
+      {
+        x: xScale(barNames[t.topic]),
+        y: chartHeight - yScale(t.end),
+      },
+      {
+        x: xScale(barNames[transitions[i + 1].topic]),
+        y: chartHeight - yScale(transitions[i + 1].start),
+      },
+    ];
+
+    linesBetweenTopics.push(
+      chartGroup
+        .append('path')
+        .attr('stroke', 'blue')
+        .attr('stroke-width', lineWidth)
+        .attr('fill', 'none')
+        .attr('d', lineFunc(pathPoints))
+        .attr('opacity', 0),
+    );
+  }
+
   // Add images!
   const images = chartGroup
     .selectAll('image')
@@ -150,6 +180,12 @@ function renderChart(width) {
     // condition (we reach the end of our transitions array)
     if (transitionIndex >= transitionArray.length) {
       return;
+    }
+
+    // Reveal our lines between topics as soon as we've moved onto the
+    // next topic
+    if (transitionIndex >= 1) {
+      linesBetweenTopics[transitionIndex - 1].attr('opacity', 1);
     }
 
     const t = transitionArray[transitionIndex];
