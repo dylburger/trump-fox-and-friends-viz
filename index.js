@@ -155,7 +155,7 @@ function renderChart(width) {
     pathPoints.push(endPoint);
   }
 
-  runTransitions(transitions, 0);
+  d3.select('#player').on('play', () => runTransitions(transitions, 0));
 }
 
 // Render chart once, the first time we load the page,
