@@ -3,8 +3,9 @@ const barNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
 // Placeholder data
 const data = barNames.map(el => 1);
 
-const trumpImageWidth = 30;
-const trumpImageHeight = 39;
+const trumpImageWidth = 60;
+const trumpImageHeight = 78;
+const trumpImage = 'trump.png';
 
 const transitions = [
   {
@@ -87,17 +88,46 @@ function renderChart(width) {
     .x(d => d.x)
     .y(d => d.y);
 
-  // Generate an emtpy path that we'll write
-  // to below
-  const path = chartGroup
-    .append('path')
-    .attr('stroke', 'blue')
-    .attr('stroke-width', lineWidth)
-    .attr('fill', 'none');
+  // There's no z-index for SVG that allow us to define
+  // how elements are stacked, so we must write our path
+  // elements to the DOM before the image of Trump so
+  // the path doesn't cover the image
+  //
+  // Because of the way we manage path transitions below,
+  // we must also create a path element for every state
+  // transition. Store each of these paths in an array
+  // for future maniplation / transition.
 
-  // Also generate an empty set of path points
-  // through which we'll trace our path
-  const pathPoints = [];
+  const paths = transitions.map(t => {
+    // We want to trace the path Trump takes from
+    // topic to topic. Given our transitions, we can generate
+    // (x, y) coordinates traced by those
+    // transitions (one transition yields two points)
+    const pathPoints = [
+      {
+        x: xScale(barNames[t.topic]),
+        y: chartHeight - yScale(t.start),
+      },
+      {
+        x: xScale(barNames[t.topic]),
+        y: chartHeight - yScale(t.end),
+      },
+    ];
+
+    const lineHeight = yScale(t.start) - yScale(t.end);
+
+    // See https://jaketrent.com/post/animating-d3-line/ for how
+    // we use the stroke-dashoffset attribute to make our line
+    // invisible (below, we slowly reveal the line with a D3 transition)
+    return chartGroup
+      .append('path')
+      .attr('stroke', 'blue')
+      .attr('stroke-width', lineWidth)
+      .attr('fill', 'none')
+      .attr('d', lineFunc(pathPoints))
+      .attr('stroke-dasharray', `${lineHeight} ${lineHeight}`)
+      .attr('stroke-dashoffset', lineHeight);
+  });
 
   // Add images!
   const images = chartGroup
@@ -106,11 +136,11 @@ function renderChart(width) {
     .enter()
     .append('image');
 
-  // Give our circle some attributes
+  // Give our image some attributes
   const imageAttrs = images
     .attr('x', (d, i) => xScale(barNames[i]) - trumpImageWidth / 2)
     .attr('y', -(trumpImageHeight / 2))
-    .attr('xlink:href', 'trump.jpg')
+    .attr('xlink:href', trumpImage)
     .attr('width', trumpImageWidth)
     .attr('height', trumpImageHeight)
     .attr('opacity', 0);
@@ -130,43 +160,25 @@ function renderChart(width) {
       .duration(1000 * (t.end - t.start))
       .attr('y', chartHeight - yScale(t.end) - trumpImageHeight / 2);
 
-    // We want to trace the path Trump takes from
-    // topic to topic. Given our transitions, we can generate
-    // (x, y) coordinates traced by those
-    // transitions
-    const startPoint = {
-      x: xScale(barNames[t.topic]),
-      y: chartHeight - yScale(t.start),
-    };
-    const endPoint = {
-      x: xScale(barNames[t.topic]),
-      y: chartHeight - yScale(t.end),
-    };
-
-    path
-      .attr('d', lineFunc(pathPoints.concat(startPoint)))
+    // For each of the paths we created earlier, create a transition that
+    // slowly exposes the line over the duration of the topic
+    // Again, see https://jaketrent.com/post/animating-d3-line/ for how
+    // we use the stroke-dashoffset attribute to accomplish this.
+    paths[transitionIndex]
       .transition()
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - t.start))
-      .attr('d', lineFunc(pathPoints.concat(startPoint).concat(endPoint)))
+      .attr('stroke-dashoffset', 0)
       .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
-
-    pathPoints.push(startPoint);
-    pathPoints.push(endPoint);
   }
 
+  // Start our transitions when the user hits play so the audio
+  // and transitions are synced
   d3.select('#player').on('play', () => runTransitions(transitions, 0));
 }
 
-// Render chart once, the first time we load the page,
-// passing in the width of the browser screen
 renderChart(window.innerWidth);
 
-// The "resize" event will not fire for specific elements,
-// only when the browser itself is resized. Therefore, we have
-// to add an event listener on the global "window" object.
-//
-// https://developer.mozilla.org/en-US/docs/Web/Events/resize
 window.addEventListener('resize', () => {
   renderChart(window.innerWidth, window.innerHeight);
 });
