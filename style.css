@@ -1,3 +1,11 @@
 .axis {
   font-size: 16px;
 }
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}

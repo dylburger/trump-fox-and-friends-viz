@@ -109,6 +109,15 @@ function scrollTween(offset) {
   };
 }
 
+// Add a pause button to the screen,
+// adding an event listener on this button
+// to pause the audio
+const pausePlayButton = d3
+  .select('#pausePlayButton')
+  .append('img')
+  .attr('src', 'play.png')
+  .attr('data-button-type', 'play');
+
 function renderChart(width) {
   // This has the effect of always keeping the ratio between height
   // and width the same
@@ -275,9 +284,7 @@ function renderChart(width) {
 
   // Start our transitions when the user hits play so the audio
   // and transitions are synced
-  d3.select('#player').on('play', () => {
-    runTransitions(transitions, 0);
-
+  pausePlayButton.on('click', () => {
     const scrollTransition = d3
       .transition('scroll')
       .ease(d3.easeLinear)
@@ -290,32 +297,30 @@ function renderChart(width) {
         ),
       );
 
-    console.log(scrollTransition);
+    const audioNode = d3.select('#player').node();
 
-    // Add a pause button to the screen,
-    // adding an event listener on this button
-    // to pause the audio
-    const pauseButton = d3
-      .select('#pauseButton')
-      .append('img')
-      .attr('src', 'pause.png')
-      .attr('width', 30)
-      .attr('height', 30);
+    const buttonType = pausePlayButton.attr('data-button-type');
+    if (buttonType === 'pause') {
+      audioNode.pause();
 
-    pauseButton.on('click', () => {
-      d3
-        .select('#player')
-        .node()
-        .pause();
+      // Swap the pause and play button
+      pausePlayButton.attr('src', 'play.png').attr('data-button-type', 'play');
 
-      // Interrupt the scroll we put into place earlier
+      // Interrupt the scroll and x axis transition
+      // we put into place earlier
       d3.interrupt(scrollTransition.node(), 'scroll');
 
-      // Interrupt the other transitions
+      // Interrupt transitions on our paths and images
       imageAttrs.nodes().forEach(node => d3.interrupt(node));
       paths.forEach(path => d3.interrupt(path.node()));
       linesBetweenTopics.forEach(line => d3.interrupt(line.node()));
-    });
+    } else {
+      audioNode.play();
+      pausePlayButton
+        .attr('src', 'pause.png')
+        .attr('data-button-type', 'pause');
+      runTransitions(transitions, 0);
+    }
   });
 }
 
