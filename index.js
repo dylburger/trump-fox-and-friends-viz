@@ -73,7 +73,7 @@ const margin = {
   top: 200,
   right: 50,
   bottom: 50,
-  left: 50,
+  left: 30,
 };
 
 const svg = d3.select('#app').append('svg');
@@ -121,7 +121,7 @@ const pausePlayButton = d3
 function renderChart(width) {
   // This has the effect of always keeping the ratio between height
   // and width the same
-  const height = 3 * width * 0.7;
+  const height = 5 * width * 0.7;
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
