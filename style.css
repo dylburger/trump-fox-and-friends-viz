@@ -1,11 +1,17 @@
 .axis {
   font-size: 16px;
+  font-weight: bold;
 }
 
-.visible {
+#footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+#pausePlayButton img {
+  padding-bottom: 30px;
+  margin: 0 auto;
   display: block;
-}
-
-.hidden {
-  display: none;
 }

@@ -70,7 +70,7 @@ const transitions = [
 ];
 
 const margin = {
-  top: 150,
+  top: 200,
   right: 50,
   bottom: 50,
   left: 50,
@@ -247,7 +247,7 @@ function renderChart(width) {
     .attr('xlink:href', trumpImage)
     .attr('width', trumpImageWidth)
     .attr('height', trumpImageHeight)
-    .attr('opacity', 0);
+    .attr('opacity', (d, i) => (i === 0 ? 1 : 0));
 
   function runTransitions(transitionArray, transitionIndex) {
     // Continue running transitions until we hit our termination
