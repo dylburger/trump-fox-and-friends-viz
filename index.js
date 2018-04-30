@@ -70,7 +70,7 @@ const transitions = [
 ];
 
 const margin = {
-  top: 100,
+  top: 150,
   right: 50,
   bottom: 50,
   left: 50,
@@ -86,10 +86,10 @@ const xScale = d3
   .domain(barNames)
   .padding(0.1);
 
-yAxis = d3.axisLeft(yScale);
+yAxis = d3.axisLeft(yScale).tickSize(0);
 xAxis = d3.axisBottom(xScale).tickSize(0);
-yAxisGroup = chartGroup.append('g');
-xAxisGroup = chartGroup.append('g');
+yAxisGroup = chartGroup.append('g').attr('class', 'axis');
+xAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
 const bars = chartGroup
   .append('g')
@@ -132,12 +132,13 @@ function renderChart(width) {
     .selectAll('text')
     .attr('transform', 'rotate(-45)');
 
-  // Remove the line on our x axis, leaving just axis labels
+  // Remove the line on our axes, leaving just axis labels
   xAxisGroup.select('path').attr('stroke', '#fff');
+  yAxisGroup.select('path').attr('stroke', '#fff');
 
+  //
   const lineWidth = 3;
   bars
-    .attr('width', lineWidth)
     .attr('height', chartHeight)
     .attr('x', (d, i) => xScale(barNames[i]) + xScale.bandwidth() / 2)
     .attr('y', 0);
@@ -277,8 +278,8 @@ function renderChart(width) {
   d3.select('#player').on('play', () => {
     runTransitions(transitions, 0);
 
-    d3
-      .transition()
+    const scrollTransition = d3
+      .transition('scroll')
       .ease(d3.easeLinear)
       .delay(1500)
       .duration(numSeconds * 1000)
@@ -288,6 +289,33 @@ function renderChart(width) {
           document.body.getBoundingClientRect().height - window.innerHeight,
         ),
       );
+
+    console.log(scrollTransition);
+
+    // Add a pause button to the screen,
+    // adding an event listener on this button
+    // to pause the audio
+    const pauseButton = d3
+      .select('#pauseButton')
+      .append('img')
+      .attr('src', 'pause.png')
+      .attr('width', 30)
+      .attr('height', 30);
+
+    pauseButton.on('click', () => {
+      d3
+        .select('#player')
+        .node()
+        .pause();
+
+      // Interrupt the scroll we put into place earlier
+      d3.interrupt(scrollTransition.node(), 'scroll');
+
+      // Interrupt the other transitions
+      imageAttrs.nodes().forEach(node => d3.interrupt(node));
+      paths.forEach(path => d3.interrupt(path.node()));
+      linesBetweenTopics.forEach(line => d3.interrupt(line.node()));
+    });
   });
 }
 
