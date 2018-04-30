@@ -55,6 +55,16 @@ const bars = chartGroup
   .append('rect')
   .classed('bar', true);
 
+function scrollTween(offset) {
+  return () => {
+    const i = d3.interpolateNumber(
+      window.pageYOffset || document.documentElement.scrollTop,
+      offset,
+    );
+    return t => scrollTo(0, i(t));
+  };
+}
+
 function renderChart(width) {
   const height = width;
   svg.attr('width', width).attr('height', height);
@@ -63,7 +73,7 @@ function renderChart(width) {
 
   // This has the effect of always keeping the ratio between height
   // and width the same
-  const chartHeight = height * 0.7;
+  const chartHeight = numSeconds * 100;
 
   chartGroup
     .attr('width', chartWidth)
@@ -210,7 +220,21 @@ function renderChart(width) {
 
   // Start our transitions when the user hits play so the audio
   // and transitions are synced
-  d3.select('#player').on('play', () => runTransitions(transitions, 0));
+  d3.select('#player').on('play', () => {
+    runTransitions(transitions, 0);
+
+    d3
+      .transition()
+      .ease(d3.easeLinear)
+      .delay(1500)
+      .duration(numSeconds * 1000)
+      .tween(
+        'scroll',
+        scrollTween(
+          document.body.getBoundingClientRect().height - window.innerHeight,
+        ),
+      );
+  });
 }
 
 renderChart(window.innerWidth);
