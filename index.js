@@ -1,5 +1,19 @@
-const numSeconds = 10;
-const barNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
+const numSeconds = 96;
+const barNames = [
+  'Comey',
+  'Special Counsel',
+  'Collusion',
+  'Russia',
+  'His Accomplishments',
+  'CNN',
+  'Democrats',
+  'Unfairness',
+  'Justice Department',
+  'FBI',
+  'Paul Manafort',
+  'Michael Cohen',
+];
+
 // Placeholder data
 const data = barNames.map(el => 1);
 
@@ -10,23 +24,53 @@ const trumpImage = 'trump.png';
 const transitions = [
   {
     start: 0,
-    end: 2,
+    end: 33,
     topic: 0,
   },
   {
-    start: 2,
-    end: 4,
+    start: 33,
+    end: 37,
     topic: 1,
   },
   {
-    start: 4,
-    end: 10,
+    start: 37,
+    end: 42,
     topic: 2,
+  },
+  {
+    start: 42,
+    end: 49,
+    topic: 3,
+  },
+  {
+    start: 49,
+    end: 69,
+    topic: 4,
+  },
+  {
+    start: 69,
+    end: 70,
+    topic: 2,
+  },
+  {
+    start: 70,
+    end: 78,
+    topic: 0,
+  },
+  {
+    start: 78,
+    end: 79,
+    topic: 1,
+  },
+  {
+    start: 79,
+    end: 96,
+    topic: 0,
   },
 ];
 
 const margin = {
-  top: 50,
+  top: 100,
   right: 50,
   bottom: 50,
   left: 50,
@@ -43,7 +87,7 @@ const xScale = d3
   .padding(0.1);
 
 yAxis = d3.axisLeft(yScale);
-xAxis = d3.axisBottom(xScale);
+xAxis = d3.axisBottom(xScale).tickSize(0);
 yAxisGroup = chartGroup.append('g');
 xAxisGroup = chartGroup.append('g');
 
@@ -66,30 +110,36 @@ function scrollTween(offset) {
 }
 
 function renderChart(width) {
-  const height = width;
-  svg.attr('width', width).attr('height', height);
-
-  const chartWidth = width - margin.left - margin.right;
-
   // This has the effect of always keeping the ratio between height
   // and width the same
-  const chartHeight = numSeconds * 100;
+  const height = 3 * width * 0.7;
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
 
+  svg.attr('width', width).attr('height', height);
   chartGroup
     .attr('width', chartWidth)
     .attr('height', chartHeight)
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-  yScale.range([chartHeight, 0]);
+  yScale.range([0, chartHeight]);
   xScale.range([0, chartWidth]);
 
   yAxisGroup.call(yAxis);
+  xAxisGroup
+    .call(xAxis)
+    .attr('transform', `translate(0, -${margin.top / 2})`)
+    .selectAll('text')
+    .attr('transform', 'rotate(-45)');
+
+  // Remove the line on our x axis, leaving just axis labels
+  xAxisGroup.select('path').attr('stroke', '#fff');
 
   const lineWidth = 3;
   bars
     .attr('width', lineWidth)
     .attr('height', chartHeight)
-    .attr('x', (d, i) => xScale(barNames[i]))
+    .attr('x', (d, i) => xScale(barNames[i]) + xScale.bandwidth() / 2)
     .attr('y', 0);
 
   // Then, generate a line function that will draw our path
@@ -115,16 +165,16 @@ function renderChart(width) {
     // transitions (one transition yields two points)
     const pathPoints = [
       {
-        x: xScale(barNames[t.topic]),
-        y: chartHeight - yScale(t.start),
+        x: xScale(barNames[t.topic]) + xScale.bandwidth() / 2,
+        y: yScale(t.start),
       },
       {
-        x: xScale(barNames[t.topic]),
-        y: chartHeight - yScale(t.end),
+        x: xScale(barNames[t.topic]) + xScale.bandwidth() / 2,
+        y: yScale(t.end),
       },
     ];
 
-    const lineHeight = yScale(t.start) - yScale(t.end);
+    const lineHeight = yScale(t.end) - yScale(t.start);
 
     // See https://jaketrent.com/post/animating-d3-line/ for how
     // we use the stroke-dashoffset attribute to make our line
@@ -149,12 +199,12 @@ function renderChart(width) {
     // and the (x, y) coordinates of the start of the next state
     const pathPoints = [
       {
-        x: xScale(barNames[t.topic]),
-        y: chartHeight - yScale(t.end),
+        x: xScale(barNames[t.topic]) + xScale.bandwidth() / 2,
+        y: yScale(t.end),
       },
       {
-        x: xScale(barNames[transitions[i + 1].topic]),
-        y: chartHeight - yScale(transitions[i + 1].start),
+        x: xScale(barNames[transitions[i + 1].topic]) + xScale.bandwidth() / 2,
+        y: yScale(transitions[i + 1].start),
       },
     ];
 
@@ -178,7 +228,11 @@ function renderChart(width) {
 
   // Give our image some attributes
   const imageAttrs = images
-    .attr('x', (d, i) => xScale(barNames[i]) - trumpImageWidth / 2)
+    .attr(
+      'x',
+      (d, i) =>
+        xScale(barNames[i]) + xScale.bandwidth() / 2 - trumpImageWidth / 2,
+    )
     .attr('y', -(trumpImageHeight / 2))
     .attr('xlink:href', trumpImage)
     .attr('width', trumpImageWidth)
@@ -204,7 +258,7 @@ function renderChart(width) {
       .transition()
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - t.start))
-      .attr('y', chartHeight - yScale(t.end) - trumpImageHeight / 2);
+      .attr('y', yScale(t.end) - trumpImageHeight / 2);
 
     // For each of the paths we created earlier, create a transition that
     // slowly exposes the line over the duration of the topic
