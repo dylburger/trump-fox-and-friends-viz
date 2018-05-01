@@ -27,11 +27,11 @@ const trumpImage = 'trump.png';
 const transitions = [
   {
     start: 0,
-    end: 33,
+    end: 3,
     topic: 0,
   },
   {
-    start: 33,
+    start: 3,
     end: 37,
     topic: 1,
   },
@@ -261,7 +261,6 @@ function renderChart(width) {
 
     const t = transitionArray[transitionIndex];
     if (numSecondsElapsed > t.end) {
-      console.log(`${numSecondsElapsed} > ${t.end}. Moving to next transition`);
       runTransitions(transitionArray, transitionIndex + 1);
       return;
     }
@@ -276,7 +275,7 @@ function renderChart(width) {
       .attr('opacity', (d, i) => (i === t.topic ? 1 : 0))
       .transition()
       .ease(d3.easeLinear)
-      .duration(1000 * (t.end - t.start))
+      .duration(1000 * (t.end - numSecondsElapsed))
       .attr('y', yScale(t.end) - trumpImageHeight / 2);
 
     // For each of the paths we created earlier, create a transition that
@@ -286,7 +285,7 @@ function renderChart(width) {
     paths[transitionIndex]
       .transition()
       .ease(d3.easeLinear)
-      .duration(1000 * (t.end - t.start))
+      .duration(1000 * (t.end - numSecondsElapsed))
       .attr('stroke-dashoffset', 0)
       .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
   }
@@ -342,9 +341,8 @@ function renderChart(width) {
 
       // Increment the number of seconds that have elapsed since clicking play
       numSecondsElapsedTimer = window.setInterval(() => {
-        console.log('num seconds elapsed:', numSecondsElapsed);
-        numSecondsElapsed += 1;
-      }, 1000);
+        numSecondsElapsed += 0.1;
+      }, 100);
 
       pausePlayButton
         .attr('src', 'pause.png')
