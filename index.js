@@ -73,7 +73,7 @@ const transitions = [
 ];
 
 const margin = {
-  top: 200,
+  top: 300,
   right: 50,
   bottom: 50,
   left: 30,
