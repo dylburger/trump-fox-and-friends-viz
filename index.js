@@ -311,13 +311,8 @@ function renderChart(width) {
     const scrollTransition = d3
       .transition('scroll')
       .ease(d3.easeLinear)
-      .duration(numSeconds * 1000)
-      .tween(
-        'scroll',
-        scrollTween(
-          document.body.getBoundingClientRect().height - window.innerHeight,
-        ),
-      );
+      .duration((numSeconds - numSecondsElapsed) * 1000)
+      .tween('scroll', scrollTween(chartHeight));
 
     const audioNode = d3.select('#player').node();
 
