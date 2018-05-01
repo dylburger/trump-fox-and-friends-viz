@@ -14,6 +14,9 @@ const barNames = [
   'Michael Cohen',
 ];
 
+let numSecondsElapsed = 0;
+let numSecondsElapsedTimer = null;
+
 // Placeholder data
 const data = barNames.map(el => 1);
 
@@ -256,13 +259,19 @@ function renderChart(width) {
       return;
     }
 
+    const t = transitionArray[transitionIndex];
+    if (numSecondsElapsed > t.end) {
+      console.log(`${numSecondsElapsed} > ${t.end}. Moving to next transition`);
+      runTransitions(transitionArray, transitionIndex + 1);
+      return;
+    }
+
     // Reveal our lines between topics as soon as we've moved onto the
     // next topic
     if (transitionIndex >= 1) {
       linesBetweenTopics[transitionIndex - 1].attr('opacity', 1);
     }
 
-    const t = transitionArray[transitionIndex];
     imageAttrs
       .attr('opacity', (d, i) => (i === t.topic ? 1 : 0))
       .transition()
@@ -282,13 +291,27 @@ function renderChart(width) {
       .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
   }
 
+  function pauseTransitions(transitionArray, transitionIndex) {
+    if (transitionIndex >= transitionArray.length) {
+      return;
+    }
+
+    if (transitionIndex >= 1) {
+      linesBetweenTopics[transitionIndex - 1].transition().duration(0);
+    }
+
+    imageAttrs.transition().duration(0);
+    paths[transitionIndex].transition().duration(0);
+
+    pauseTransitions(transitionArray, transitionIndex + 1);
+  }
+
   // Start our transitions when the user hits play so the audio
   // and transitions are synced
   pausePlayButton.on('click', () => {
     const scrollTransition = d3
       .transition('scroll')
       .ease(d3.easeLinear)
-      .delay(1500)
       .duration(numSeconds * 1000)
       .tween(
         'scroll',
@@ -301,6 +324,8 @@ function renderChart(width) {
 
     const buttonType = pausePlayButton.attr('data-button-type');
     if (buttonType === 'pause') {
+      window.clearInterval(numSecondsElapsedTimer);
+
       audioNode.pause();
 
       // Swap the pause and play button
@@ -311,11 +336,16 @@ function renderChart(width) {
       d3.interrupt(scrollTransition.node(), 'scroll');
 
       // Interrupt transitions on our paths and images
-      imageAttrs.nodes().forEach(node => d3.interrupt(node));
-      paths.forEach(path => d3.interrupt(path.node()));
-      linesBetweenTopics.forEach(line => d3.interrupt(line.node()));
+      pauseTransitions(transitions, 0);
     } else {
       audioNode.play();
+
+      // Increment the number of seconds that have elapsed since clicking play
+      numSecondsElapsedTimer = window.setInterval(() => {
+        console.log('num seconds elapsed:', numSecondsElapsed);
+        numSecondsElapsed += 1;
+      }, 1000);
+
       pausePlayButton
         .attr('src', 'pause.png')
         .attr('data-button-type', 'pause');
