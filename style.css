@@ -20,14 +20,36 @@ h1 {
 
 #footer {
   position: fixed;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   bottom: 0;
   width: 100%;
   z-index: 100;
 }
 
+#footer div:first-child {
+  margin-right: auto;
+  visibility: hidden;
+}
+
+#footer div:last-child {
+  margin-left: auto;
+  margin-right: 100px;
+  margin-bottom: 30px;
+}
+
 #pausePlayButton img {
   padding-bottom: 30px;
   margin: 0 auto;
+  display: block;
+}
+
+#pausePlayButton img {
+  padding-bottom: 30px;
+  margin-left: auto;
+  margin-right: 0;
   display: block;
 }
 
@@ -38,10 +60,15 @@ p {
 }
 
 .quotation {
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin-top: 30px;
+  margin-bottom: 30px;
   margin-left: 40px;
   margin-right: 40px;
   font-style: italic;
   line-height: 2;
+}
+
+#tangentTally {
+  font-size: 30px;
+  font-weight: bold;
 }

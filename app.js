@@ -17,6 +17,9 @@ const barNames = [
 let numSecondsElapsed = 0;
 let numSecondsElapsedTimer = null;
 
+const topicSet = new Set();
+const tangentTallySpan = d3.select('#tangentTallyCount');
+
 // Placeholder data
 const data = barNames.map(el => 1);
 
@@ -257,6 +260,11 @@ function renderChart(width) {
     }
 
     const t = transitionArray[transitionIndex];
+    // Add the current topic to the set of topics we've seen so far,
+    // updating the count of distinct tangents so far
+    topicSet.add(t.topic);
+    tangentTallySpan.text(topicSet.size);
+
     if (numSecondsElapsed > t.end) {
       runTransitions(transitionArray, transitionIndex + 1);
       return;
