@@ -281,6 +281,7 @@ function renderChart(width) {
       .text(barNames[t.topic])
       .attr('y', yScale(t.start) - 40)
       .attr('x', xScale(barNames[t.topic]))
+      .attr('text-anchor', 'start')
       .classed('topics', true);
 
     // For each of the paths we created earlier, create a transition that
