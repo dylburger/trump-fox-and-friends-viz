@@ -73,10 +73,10 @@ const transitions = [
 ];
 
 const margin = {
-  top: 300,
+  top: 70,
   right: 50,
   bottom: 50,
-  left: 30,
+  left: 60,
 };
 
 const svg = d3.select('#app').append('svg');
@@ -89,10 +89,14 @@ const xScale = d3
   .domain(barNames)
   .padding(0.1);
 
-yAxis = d3.axisLeft(yScale).tickSize(0);
-xAxis = d3.axisBottom(xScale).tickSize(0);
+const formatTime = d3.timeFormat('%_M:%S');
+const formatSeconds = s => formatTime(new Date(2018, 1, 1, 0, 0, s));
+
+yAxis = d3
+  .axisLeft(yScale)
+  .tickSize(0)
+  .tickFormat(formatSeconds);
 yAxisGroup = chartGroup.append('g').attr('class', 'axis');
-xAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
 const bars = chartGroup
   .append('g')
@@ -138,17 +142,10 @@ function renderChart(width) {
   xScale.range([0, chartWidth]);
 
   yAxisGroup.call(yAxis);
-  xAxisGroup
-    .call(xAxis)
-    .attr('transform', `translate(0, -${margin.top / 2})`)
-    .selectAll('text')
-    .attr('transform', 'rotate(-45)');
 
   // Remove the line on our axes, leaving just axis labels
-  xAxisGroup.select('path').attr('stroke', '#fff');
   yAxisGroup.select('path').attr('stroke', '#fff');
 
-  //
   const lineWidth = 3;
   bars
     .attr('height', chartHeight)
@@ -194,7 +191,7 @@ function renderChart(width) {
     // invisible (below, we slowly reveal the line with a D3 transition)
     return chartGroup
       .append('path')
-      .attr('stroke', 'blue')
+      .attr('stroke', 'red')
       .attr('stroke-width', lineWidth)
       .attr('fill', 'none')
       .attr('d', lineFunc(pathPoints))
@@ -224,7 +221,7 @@ function renderChart(width) {
     linesBetweenTopics.push(
       chartGroup
         .append('path')
-        .attr('stroke', 'blue')
+        .attr('stroke', 'red')
         .attr('stroke-width', lineWidth)
         .attr('fill', 'none')
         .attr('d', lineFunc(pathPoints))
@@ -277,6 +274,14 @@ function renderChart(width) {
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - numSecondsElapsed))
       .attr('y', yScale(t.end) - trumpImageHeight / 2);
+
+    // Add text for the topic Trump just moved to
+    chartGroup
+      .append('text')
+      .text(barNames[t.topic])
+      .attr('y', yScale(t.start) - 40)
+      .attr('x', xScale(barNames[t.topic]))
+      .classed('topics', true);
 
     // For each of the paths we created earlier, create a transition that
     // slowly exposes the line over the duration of the topic
