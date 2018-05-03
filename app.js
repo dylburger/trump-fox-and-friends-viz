@@ -1,4 +1,4 @@
-const numSeconds = 96;
+const numSeconds = 267;
 const barNames = [
   'Comey',
   'Special Counsel',
@@ -9,9 +9,10 @@ const barNames = [
   'Democrats',
   'Unfairness',
   'Justice Department',
+  'Witch Hunt',
   'FBI',
   'Paul Manafort',
-  'Michael Cohen',
+  'Cohen',
 ];
 
 let numSecondsElapsed = 0;
@@ -30,48 +31,158 @@ const trumpImage = 'trump.png';
 const transitions = [
   {
     start: 0,
-    end: 3,
+    end: 6,
     topic: 0,
   },
   {
-    start: 3,
-    end: 37,
+    start: 6,
+    end: 10,
     topic: 1,
   },
   {
-    start: 37,
-    end: 42,
+    start: 10,
+    end: 15,
     topic: 2,
   },
   {
-    start: 42,
-    end: 49,
+    start: 15,
+    end: 22,
     topic: 3,
   },
   {
-    start: 49,
-    end: 69,
+    start: 22,
+    end: 42,
     topic: 4,
   },
   {
-    start: 69,
-    end: 70,
+    start: 42,
+    end: 43,
     topic: 2,
   },
   {
-    start: 70,
-    end: 78,
+    start: 43,
+    end: 51,
     topic: 0,
   },
   {
-    start: 78,
-    end: 79,
+    start: 51,
+    end: 52,
     topic: 1,
   },
   {
-    start: 79,
-    end: 96,
+    start: 52,
+    end: 70,
     topic: 0,
+  },
+  {
+    start: 70,
+    end: 99,
+    topic: 3,
+  },
+  {
+    start: 99,
+    end: 101,
+    topic: 5,
+  },
+  {
+    start: 101,
+    end: 105,
+    topic: 6,
+  },
+  {
+    start: 105,
+    end: 119,
+    topic: 7,
+  },
+  {
+    start: 119,
+    end: 130,
+    topic: 5,
+  },
+  {
+    start: 130,
+    end: 134,
+    topic: 0,
+  },
+  {
+    start: 134,
+    end: 138,
+    topic: 5,
+  },
+  {
+    start: 138,
+    end: 142,
+    topic: 0,
+  },
+  {
+    start: 142,
+    end: 158,
+    topic: 8,
+  },
+  {
+    start: 158,
+    end: 160,
+    topic: 9,
+  },
+  {
+    start: 160,
+    end: 163,
+    topic: 8,
+  },
+  {
+    start: 163,
+    end: 167,
+    topic: 9,
+  },
+  {
+    start: 167,
+    end: 183,
+    topic: 8,
+  },
+  {
+    start: 183,
+    end: 213,
+    topic: 4,
+  },
+  {
+    start: 213,
+    end: 230,
+    topic: 8,
+  },
+  {
+    start: 230,
+    end: 232,
+    topic: 2,
+  },
+  {
+    start: 232,
+    end: 242,
+    topic: 6,
+  },
+  {
+    start: 242,
+    end: 246,
+    topic: 10,
+  },
+  {
+    start: 246,
+    end: 255,
+    topic: 11,
+  },
+  {
+    start: 255,
+    end: 260,
+    topic: 12,
+  },
+  {
+    start: 260,
+    end: 265,
+    topic: 6,
+  },
+  {
+    start: 265,
+    end: 267,
+    topic: 10,
   },
 ];
 
