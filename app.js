@@ -1,4 +1,4 @@
-const numSeconds = 267;
+const numSeconds = 270;
 const barNames = [
   'Comey',
   'Special Counsel',
@@ -18,14 +18,17 @@ const barNames = [
 let numSecondsElapsed = 0;
 let numSecondsElapsedTimer = null;
 
-const topicSet = new Set();
+// We increment the tangent count for each new topic Trump talks about,
+// but the first topic isn't a tangent (it's tied to the question).
+// This has the effect of starting our count at 0.
+let tangentCount = -1;
 const tangentTallySpan = d3.select('#tangentTallyCount');
 
 // Placeholder data
 const data = barNames.map(el => 1);
 
-const trumpImageWidth = 60;
-const trumpImageHeight = 78;
+const trumpImageWidth = 80;
+const trumpImageHeight = 104;
 const trumpImage = 'trump.png';
 
 const transitions = [
@@ -371,10 +374,9 @@ function renderChart(width) {
     }
 
     const t = transitionArray[transitionIndex];
-    // Add the current topic to the set of topics we've seen so far,
-    // updating the count of distinct tangents so far
-    topicSet.add(t.topic);
-    tangentTallySpan.text(topicSet.size);
+
+    tangentCount += 1;
+    tangentTallySpan.text(tangentCount);
 
     if (numSecondsElapsed > t.end) {
       runTransitions(transitionArray, transitionIndex + 1);
