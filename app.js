@@ -207,6 +207,7 @@ const xScale = d3
   .padding(0.1);
 
 const formatTime = d3.timeFormat('%_M:%S');
+// We only care about the minutes and seconds part of our datetime object
 const formatSeconds = s => formatTime(new Date(2018, 1, 1, 0, 0, s));
 
 yAxis = d3
