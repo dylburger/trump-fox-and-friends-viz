@@ -7,7 +7,7 @@ const barNames = [
   'His Accomplishments',
   'CNN',
   'Democrats',
-  'Unfairness',
+  'Double Standard',
   'Justice Department',
   'Witch Hunt',
   'FBI',
