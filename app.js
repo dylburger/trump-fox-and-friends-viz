@@ -233,6 +233,11 @@ function scrollTween(offset) {
   };
 }
 
+function isAudioPlaying() {
+  const audioNode = d3.select('#player');
+  return audioNode.duration > 0 && !audioNode.paused;
+}
+
 // Add a pause button to the screen,
 // adding an event listener on this button
 // to pause the audio
@@ -432,9 +437,29 @@ function renderChart(width) {
     pauseTransitions(transitionArray, transitionIndex + 1);
   }
 
-  // Start our transitions when the user hits play so the audio
-  // and transitions are synced
-  pausePlayButton.on('click', () => {
+  // Should we pause or play?
+  const shouldWePlay = eventType => {
+    let play = false;
+    if (eventType === 'pausePlayButtonClick') {
+      const buttonType = pausePlayButton.attr('data-button-type');
+      switch (buttonType) {
+        case 'pause':
+          break;
+        case 'play':
+          play = true;
+          break;
+        default:
+          break;
+      }
+    }
+
+    // We need no explicit logic for handling visibility changes,
+    // since we default to the paused state here
+
+    return play;
+  };
+
+  const handlePlayOrPauseStateChanges = eventType => {
     const scrollTransition = d3
       .transition('scroll')
       .ease(d3.easeLinear)
@@ -442,9 +467,21 @@ function renderChart(width) {
       .tween('scroll', scrollTween(chartHeight));
 
     const audioNode = d3.select('#player').node();
-
     const buttonType = pausePlayButton.attr('data-button-type');
-    if (buttonType === 'pause') {
+
+    if (shouldWePlay(eventType)) {
+      audioNode.play();
+
+      // Increment the number of seconds that have elapsed since clicking play
+      numSecondsElapsedTimer = window.setInterval(() => {
+        numSecondsElapsed += 0.1;
+      }, 100);
+
+      pausePlayButton
+        .attr('src', 'pause.png')
+        .attr('data-button-type', 'pause');
+      runTransitions(transitions, 0);
+    } else {
       window.clearInterval(numSecondsElapsedTimer);
 
       audioNode.pause();
@@ -458,19 +495,18 @@ function renderChart(width) {
 
       // Interrupt transitions on our paths and images
       pauseTransitions(transitions, 0);
-    } else {
-      audioNode.play();
-
-      // Increment the number of seconds that have elapsed since clicking play
-      numSecondsElapsedTimer = window.setInterval(() => {
-        numSecondsElapsed += 0.1;
-      }, 100);
-
-      pausePlayButton
-        .attr('src', 'pause.png')
-        .attr('data-button-type', 'pause');
-      runTransitions(transitions, 0);
     }
+  };
+
+  // Start our transitions when the user hits play and
+  // pause transition when the user pauses audio
+  pausePlayButton.on('click', () => {
+    handlePlayOrPauseStateChanges('pausePlayButtonClick');
+  });
+
+  // Pause audio and transitions when the user leaves the page
+  d3.select(document).on('visibilitychange', () => {
+    handlePlayOrPauseStateChanges('visibilityChange');
   });
 }
 
