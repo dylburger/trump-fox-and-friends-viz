@@ -381,13 +381,17 @@ function renderChart(width) {
 
     const t = transitionArray[transitionIndex];
 
-    tangentCount += 1;
-    tangentTallySpan.text(tangentCount);
-
+    // In this condition, we've paused and restarted our
+    // transitions, and we need to pick up where we left off
+    // (with the transition and tangent count where we ended)
     if (numSecondsElapsed > t.end) {
+      tangentCount = transitionIndex;
       runTransitions(transitionArray, transitionIndex + 1);
       return;
     }
+
+    tangentCount += 1;
+    tangentTallySpan.text(tangentCount);
 
     // Reveal our lines between topics as soon as we've moved onto the
     // next topic
