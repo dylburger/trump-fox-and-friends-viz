@@ -355,7 +355,7 @@ function renderChart(width) {
   // Add images!
   const images = chartGroup
     .selectAll('image')
-    .data(data)
+    .data([1])
     .enter()
     .append('image');
 
@@ -369,8 +369,7 @@ function renderChart(width) {
     .attr('y', -(trumpImageHeight / 2))
     .attr('xlink:href', trumpImage)
     .attr('width', trumpImageWidth)
-    .attr('height', trumpImageHeight)
-    .attr('opacity', (d, i) => (i === 0 ? 1 : 0));
+    .attr('height', trumpImageHeight);
 
   function runTransitions(transitionArray, transitionIndex) {
     // Continue running transitions until we hit our termination
@@ -414,7 +413,14 @@ function renderChart(width) {
     }
 
     imageAttrs
-      .attr('opacity', (d, i) => (i === t.topic ? 1 : 0))
+      .attr(
+        'x',
+        (d, i) =>
+          xScale(barNames[t.topic]) +
+          xScale.bandwidth() / 2 -
+          trumpImageWidth / 2,
+      )
+      .attr('y', yScale(numSecondsElapsed) - trumpImageHeight / 2)
       .transition()
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - numSecondsElapsed))
