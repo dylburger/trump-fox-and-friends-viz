@@ -210,7 +210,9 @@ const formatSeconds = s => formatTime(new Date(2018, 1, 1, 0, 0, s));
 yAxis = d3
   .axisLeft(yScale)
   .tickSize(0)
-  .tickFormat(formatSeconds);
+  .tickFormat(formatSeconds)
+  .ticks(numSeconds / 10);
+
 yAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
 function scrollTween(offset) {
