@@ -3,11 +3,13 @@ body {
 }
 
 h1 {
+  font-size: 30px;
   margin-left: 20px;
+  margin-bottom: 40px;
 }
 
 .topics {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
   font-family: 'PT Serif', serif;
 }
@@ -44,7 +46,7 @@ h1 {
 
 #tangentTally span {
   float: right;
-  margin-right: 55px;
+  margin-right: 95px;
 }
 
 #tangentTallyCount {
@@ -58,7 +60,7 @@ h1 {
 
 #tangentTallyCount span {
   float: right;
-  margin-right: 30px;
+  margin-right: 60px;
 }
 
 p {
@@ -70,7 +72,7 @@ p {
 .quotation {
   margin-top: 30px;
   margin-bottom: 30px;
-  margin-left: 40px;
+  margin-left: 60px;
   margin-right: 40px;
   font-style: italic;
   line-height: 2;
@@ -78,4 +80,13 @@ p {
 
 .smallCount {
   font-size: 30px;
+}
+
+.cta {
+  font-size: 24px;
+  margin-top: 40px;
+}
+
+.cta-image {
+  display: inline-block;
 }
