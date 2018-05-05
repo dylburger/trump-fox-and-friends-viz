@@ -392,6 +392,18 @@ function renderChart(width) {
 
     tangentCount += 1;
     tangentTallySpan.text(tangentCount);
+    // Make the tangent tally "pop"
+    tangentTallySpan
+      .transition()
+      .duration(500)
+      .styleTween('font-size', () =>
+        d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
+      )
+      .transition()
+      .styleTween('font-size', () =>
+        d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
+      )
+      .duration(500);
 
     // Reveal our lines between topics as soon as we've moved onto the
     // next topic
