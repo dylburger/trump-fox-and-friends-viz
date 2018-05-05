@@ -24,9 +24,6 @@ let numSecondsElapsedTimer = null;
 let tangentCount = -1;
 const tangentTallySpan = d3.select('#tangentTallyCountNum');
 
-// Placeholder data
-const data = barNames.map(el => 1);
-
 const trumpImageWidth = 80;
 const trumpImageHeight = 104;
 const trumpImage = 'trump.png';
@@ -216,14 +213,6 @@ yAxis = d3
   .tickFormat(formatSeconds);
 yAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
-const bars = chartGroup
-  .append('g')
-  .selectAll('rect')
-  .data(data)
-  .enter()
-  .append('rect')
-  .classed('bar', true);
-
 function scrollTween(offset) {
   return () => {
     const i = d3.interpolateNumber(
@@ -270,10 +259,6 @@ function renderChart(width) {
   yAxisGroup.select('path').attr('stroke', '#fff');
 
   const lineWidth = 3;
-  bars
-    .attr('height', chartHeight)
-    .attr('x', (d, i) => xScale(barNames[i]) + xScale.bandwidth() / 2)
-    .attr('y', 0);
 
   // Then, generate a line function that will draw our path
   const lineFunc = d3
