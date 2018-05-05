@@ -240,7 +240,7 @@ const pausePlayButton = d3
 function renderChart(width) {
   // This has the effect of always keeping the ratio between height
   // and width the same
-  const height = 5 * width * 0.7;
+  const height = 10 * width;
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
