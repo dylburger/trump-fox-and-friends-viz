@@ -25,7 +25,7 @@ h1 {
   bottom: 0;
   width: 100%;
   z-index: 3;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
 }
 
 #pausePlayButton img {
@@ -39,7 +39,7 @@ h1 {
   bottom: 0;
   width: 100%;
   z-index: 2;
-  margin-bottom: 60px;
+  margin-bottom: 90px;
   font-size: 30px;
   font-weight: bold;
 }
@@ -54,7 +54,7 @@ h1 {
   bottom: 0;
   width: 100%;
   z-index: 1;
-  margin-bottom: 60px;
+  margin-bottom: 90px;
   font-weight: bold;
 }
 
@@ -89,4 +89,15 @@ p {
 
 .cta-image {
   display: inline-block;
+}
+
+#footer {
+  margin-top: 100px;
+  width: 100%;
+  text-align: right;
+  margin-bottom: 30px;
+}
+
+#footer a {
+  margin-right: 40px;
 }
