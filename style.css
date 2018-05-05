@@ -18,39 +18,47 @@ h1 {
   font-family: 'PT Serif', serif;
 }
 
-#footer {
+#pausePlayButton {
   position: fixed;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
   bottom: 0;
   width: 100%;
-  z-index: 100;
-}
-
-#footer div:first-child {
-  margin-right: auto;
-  visibility: hidden;
-}
-
-#footer div:last-child {
-  margin-left: auto;
-  margin-right: 100px;
+  z-index: 3;
   margin-bottom: 30px;
 }
 
 #pausePlayButton img {
-  padding-bottom: 30px;
-  margin: 0 auto;
   display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#pausePlayButton img {
-  padding-bottom: 30px;
-  margin-left: auto;
-  margin-right: 0;
-  display: block;
+#tangentTally {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+  margin-bottom: 60px;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#tangentTally span {
+  float: right;
+  margin-right: 55px;
+}
+
+#tangentTallyCount {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1;
+  margin-bottom: 60px;
+  font-weight: bold;
+}
+
+#tangentTallyCount span {
+  float: right;
+  margin-right: 30px;
 }
 
 p {
@@ -66,11 +74,6 @@ p {
   margin-right: 40px;
   font-style: italic;
   line-height: 2;
-}
-
-#tangentTally {
-  font-size: 30px;
-  font-weight: bold;
 }
 
 .smallCount {

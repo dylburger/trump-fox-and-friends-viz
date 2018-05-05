@@ -22,7 +22,7 @@ let numSecondsElapsedTimer = null;
 // but the first topic isn't a tangent (it's tied to the question).
 // This has the effect of starting our count at 0.
 let tangentCount = -1;
-const tangentTallySpan = d3.select('#tangentTallyCount');
+const tangentTallySpan = d3.select('#tangentTallyCountNum');
 
 // Placeholder data
 const data = barNames.map(el => 1);
@@ -392,18 +392,20 @@ function renderChart(width) {
 
     tangentCount += 1;
     tangentTallySpan.text(tangentCount);
-    // Make the tangent tally "pop"
-    tangentTallySpan
-      .transition()
-      .duration(500)
-      .styleTween('font-size', () =>
-        d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
-      )
-      .transition()
-      .styleTween('font-size', () =>
-        d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
-      )
-      .duration(500);
+    // Make the tangent tally "pop" on changes
+    if (transitionIndex >= 1) {
+      tangentTallySpan
+        .transition()
+        .duration(500)
+        .styleTween('font-size', () =>
+          d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
+        )
+        .transition()
+        .styleTween('font-size', () =>
+          d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
+        )
+        .duration(500);
+    }
 
     // Reveal our lines between topics as soon as we've moved onto the
     // next topic
