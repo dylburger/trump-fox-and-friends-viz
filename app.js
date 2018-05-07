@@ -382,7 +382,7 @@ function renderChart(width) {
     if (transitionIndex >= 1) {
       tangentTallySpan
         .transition()
-        .duration(500)
+        .duration(250)
         .styleTween('font-size', () =>
           d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
         )
@@ -390,7 +390,7 @@ function renderChart(width) {
         .styleTween('font-size', () =>
           d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
         )
-        .duration(500);
+        .duration(250);
     }
 
     // Reveal our lines between topics as soon as we've moved onto the
