@@ -378,6 +378,7 @@ function renderChart(width) {
 
     tangentCount += 1;
     tangentTallySpan.text(tangentCount);
+
     // Make the tangent tally "pop" on changes
     if (transitionIndex >= 1) {
       tangentTallySpan
