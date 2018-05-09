@@ -18,6 +18,18 @@ h1 {
   font-family: 'PT Serif', serif;
 }
 
+#barChart {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 4;
+  margin-top: 40px;
+}
+
+#barChart svg {
+  float: right;
+}
+
 #pausePlayButton {
   position: fixed;
   bottom: 0;

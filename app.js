@@ -193,6 +193,7 @@ const margin = {
   left: 60,
 };
 
+// Main SVG
 const svg = d3.select('#app').append('svg');
 const chartGroup = svg.append('g');
 
@@ -207,13 +208,28 @@ const formatTime = d3.timeFormat('%_M:%S');
 // We only care about the minutes and seconds part of our datetime object
 const formatSeconds = s => formatTime(new Date(2018, 1, 1, 0, 0, s));
 
-yAxis = d3
+const yAxis = d3
   .axisLeft(yScale)
   .tickSize(0)
   .tickFormat(formatSeconds)
   .ticks(numSeconds / 10);
 
-yAxisGroup = chartGroup.append('g').attr('class', 'axis');
+const yAxisGroup = chartGroup.append('g').attr('class', 'axis');
+
+// Bar chart SVG to show time spent on topics
+const barChartSVG = d3.select('#barChart').append('svg');
+const barChartGroup = barChartSVG.append('g');
+
+const barChartYScale = d3
+  .scaleBand()
+  .domain(barNames)
+  .padding(0.1);
+
+const barChartXScale = d3.scaleLinear().domain([0, numSeconds]);
+
+const barChartYAxis = d3.axisLeft(barChartYScale).tickSize(0);
+
+const barChartYAxisGroup = barChartGroup.append('g').attr('class', 'axis');
 
 function scrollTween(offset) {
   return () => {
@@ -240,8 +256,6 @@ const pausePlayButton = d3
   .attr('data-button-type', 'play');
 
 function renderChart(width) {
-  // This has the effect of always keeping the ratio between height
-  // and width the same
   const height = 10 * width;
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
@@ -260,6 +274,24 @@ function renderChart(width) {
   // Remove the line on our axes, leaving just axis labels
   yAxisGroup.select('path').attr('stroke', '#fff');
 
+  // Render the bar chart
+  const barChartWidth = chartWidth / 2;
+  const barChartHeight = '300';
+  const barChartLeftMargin = barChartWidth / 2;
+
+  barChartSVG.attr('width', barChartWidth).attr('height', barChartHeight);
+  barChartGroup
+    .attr('width', barChartWidth)
+    .attr('height', barChartHeight)
+    .attr('transform', `translate(${barChartLeftMargin})`);
+
+  barChartYScale.range([0, barChartHeight]);
+  barChartXScale.range([0, barChartLeftMargin]);
+
+  barChartYAxisGroup.call(barChartYAxis);
+  barChartYAxisGroup.select('path').attr('stroke', '#fff');
+
+  // Define the line width for our paths
   const lineWidth = 3;
 
   // Then, generate a line function that will draw our path
