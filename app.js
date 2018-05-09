@@ -1,3 +1,4 @@
+let userPausedAudio = false;
 const numSeconds = 270;
 const barNames = [
   'Comey',
@@ -226,7 +227,7 @@ const barChartGroup = barChartSVG.append('g');
 const barChartYScale = d3
   .scaleBand()
   .domain(barNames)
-  .padding(0.1);
+  .padding(0.2);
 
 const barChartXScale = d3.scaleLinear().domain([0, numSeconds]);
 
@@ -282,7 +283,7 @@ function renderChart(width) {
 
   // Render the bar chart
   const barChartWidth = chartWidth / 2;
-  const barChartHeight = '300';
+  const barChartHeight = '400';
   const barChartLeftMargin = barChartWidth / 2;
   const barChartXPadding = 10;
 
@@ -413,60 +414,71 @@ function renderChart(width) {
     // transitions, and we need to pick up where we left off
     // (with the transition and tangent count where we ended)
     if (numSecondsElapsed > t.end) {
-      tangentCount = transitionIndex;
+      tangentCount = transitionIndex + 1;
       runTransitions(transitionArray, transitionIndex + 1);
       return;
     }
 
-    console.log('Transition index:', transitionIndex);
-    tangentCount += 1;
-    tangentTallySpan.text(tangentCount);
+    console.log('USER PAUSED AUDIO:', userPausedAudio);
+    console.log('Tangent count:', tangentCount);
 
-    if (transitionIndex >= 1) {
-      // Make the tangent tally "pop" on changes
-      tangentTallySpan
-        .transition()
-        .duration(250)
-        .styleTween('font-size', () =>
-          d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
-        )
-        .transition()
-        .styleTween('font-size', () =>
-          d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
-        )
-        .duration(250);
+    if (userPausedAudio === false) {
+      console.log('Transition index:', transitionIndex);
+      tangentCount += 1;
+      tangentTallySpan.text(tangentCount);
 
-      // Add the time Trump spent on the previous topic
-      const previousTransitionData = transitionArray[transitionIndex - 1];
-      timeOnTopics[previousTransitionData.topic] +=
-        timeOnTopics[previousTransitionData.topic] +
-        previousTransitionData.end -
-        previousTransitionData.start;
+      if (transitionIndex >= 1) {
+        // Make the tangent tally "pop" on changes
+        tangentTallySpan
+          .transition()
+          .duration(250)
+          .styleTween('font-size', () =>
+            d3.interpolate(tangentTallySpan.style('font-size'), '60px'),
+          )
+          .transition()
+          .styleTween('font-size', () =>
+            d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
+          )
+          .duration(250);
 
-      // Show any new y axis labels
-      barChartYAxis.tickValues(barNames.filter((el, i) => timeOnTopics[i] > 0));
-      barChartYAxisGroup.call(barChartYAxis);
+        // Add the time Trump spent on the previous topic
+        const previousTransitionData = transitionArray[transitionIndex - 1];
+        timeOnTopics[previousTransitionData.topic] +=
+          previousTransitionData.end - previousTransitionData.start;
 
-      // Update the data in our bar chart
-      const topicBars = timeOnTopicBarGroup
-        .selectAll('rect')
-        .data(timeOnTopics);
+        console.log('Time on topics:', timeOnTopics);
 
-      topicBars
-        .enter()
-        .append('rect')
-        .classed('bar', true)
-        .merge(topicBars)
-        .attr('width', d => barChartXScale(d))
-        .attr('height', barChartYScale.bandwidth())
-        .attr('y', (d, i) => barChartYScale(barNames[i]))
-        .attr('x', barChartXPadding);
+        // Show any new y axis labels
+        barChartYAxis.tickValues(
+          barNames.filter((el, i) => timeOnTopics[i] > 0),
+        );
+        barChartYAxisGroup.call(barChartYAxis);
 
-      topicBars.exit().remove();
+        // Update the data in our bar chart
+        const topicBars = timeOnTopicBarGroup
+          .selectAll('rect')
+          .data(timeOnTopics);
 
-      // Reveal our lines between topics as soon as we've moved onto the
-      // next topic
-      linesBetweenTopics[transitionIndex - 1].attr('opacity', 1);
+        topicBars
+          .enter()
+          .append('rect')
+          .classed('bar', true)
+          .merge(topicBars)
+          .attr('width', d => barChartXScale(d))
+          .attr('height', barChartYScale.bandwidth())
+          .attr('y', (d, i) => barChartYScale(barNames[i]))
+          .attr('x', barChartXPadding);
+
+        topicBars.exit().remove();
+
+        // Reveal our lines between topics as soon as we've moved onto the
+        // next topic
+        linesBetweenTopics[transitionIndex - 1].attr('opacity', 1);
+      }
+    } else {
+      // The user just played the audio again, so
+      console.log('User just started playing audio again!');
+      userPausedAudio = false;
     }
 
     imageAttrs
@@ -505,6 +517,7 @@ function renderChart(width) {
   }
 
   function pauseTransitions(transitionArray, transitionIndex) {
+    userPausedAudio = true;
     if (transitionIndex >= transitionArray.length) {
       return;
     }
