@@ -17,7 +17,6 @@ const barNames = [
 
 // Generate empty bars for each topic Trump discusses
 const timeOnTopics = barNames.map(topic => 0);
-// const timeOnTopics = [30, 40, 50, 20, 0, 0, 10, 100, 56, 100, 200, 78, 30];
 
 let numSecondsElapsed = 0;
 let numSecondsElapsedTimer = null;
@@ -419,6 +418,7 @@ function renderChart(width) {
       return;
     }
 
+    console.log('Transition index:', transitionIndex);
     tangentCount += 1;
     tangentTallySpan.text(tangentCount);
 
@@ -442,8 +442,6 @@ function renderChart(width) {
         timeOnTopics[previousTransitionData.topic] +
         previousTransitionData.end -
         previousTransitionData.start;
-
-      console.log('Time on topics:', timeOnTopics);
 
       // Show any new y axis labels
       barChartYAxis.tickValues(barNames.filter((el, i) => timeOnTopics[i] > 0));
