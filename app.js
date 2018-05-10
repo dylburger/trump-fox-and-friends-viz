@@ -190,6 +190,13 @@ const transitions = [
   },
 ];
 
+const arrayOfTopicTimes = barNames.map(topic => 0);
+transitions.forEach(el => {
+  arrayOfTopicTimes[el.topic] += el.end - el.start;
+});
+
+console.log('Array of topic times:', arrayOfTopicTimes);
+
 const margin = {
   top: 70,
   right: 50,
@@ -229,7 +236,7 @@ const barChartYScale = d3
   .domain(barNames)
   .padding(0.2);
 
-const barChartXScale = d3.scaleLinear().domain([0, numSeconds]);
+const barChartXScale = d3.scaleLinear().domain([0, d3.max(arrayOfTopicTimes)]);
 
 const barChartYAxis = d3
   .axisLeft(barChartYScale)
