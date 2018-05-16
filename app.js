@@ -434,6 +434,61 @@ function renderChart(width) {
       tangentCount += 1;
       tangentTallySpan.text(tangentCount);
 
+      // Calculate the time Trump has spent so far on all previous topics
+      const previousTransitionData =
+        transitionIndex > 0
+          ? transitionArray[transitionIndex - 1]
+          : {start: 0, end: 0, topic: 0};
+      timeOnTopics[previousTransitionData.topic] +=
+        previousTransitionData.end - previousTransitionData.start;
+
+      // And for brand new topics, start him with a little bit of time
+      // so that we show the topic name on the y axis below
+      if (timeOnTopics[t.topic] === 0) {
+        timeOnTopics[t.topic] += 0.01;
+      }
+
+      // Show any new y axis labels
+      barChartYAxis.tickValues(barNames.filter((el, i) => timeOnTopics[i] > 0));
+      barChartYAxisGroup.call(barChartYAxis);
+
+      // Update the data in our bar chart
+      const topicBars = timeOnTopicBarGroup
+        .selectAll('rect')
+        .data(timeOnTopics);
+
+      topicBars
+        .enter()
+        .append('rect')
+        .classed('bar', true)
+        .merge(topicBars)
+        .attr('width', d => barChartXScale(d))
+        .attr('height', barChartYScale.bandwidth())
+        .attr('y', (d, i) => barChartYScale(barNames[i]))
+        .attr('x', barChartXPadding)
+        .classed('currentTopic', (d, i) => (i === t.topic ? true : false))
+        .transition()
+        .ease(d3.easeLinear)
+        .duration(1000 * (t.end - numSecondsElapsed))
+        .attr(
+          'width',
+          (d, i) =>
+            i === t.topic
+              ? barChartXScale(t.end - numSecondsElapsed + d)
+              : barChartXScale(d),
+        );
+
+      topicBars.exit().remove();
+
+      // Add text for the topic Trump just moved to
+      chartGroup
+        .append('text')
+        .text(barNames[t.topic])
+        .attr('y', yScale(t.start) - 40)
+        .attr('x', xScale(barNames[t.topic]))
+        .attr('text-anchor', 'start')
+        .classed('topics', true);
+
       if (transitionIndex >= 1) {
         // Make the tangent tally "pop" on changes
         tangentTallySpan
@@ -447,36 +502,6 @@ function renderChart(width) {
             d3.interpolate(tangentTallySpan.style('font-size'), '30px'),
           )
           .duration(250);
-
-        // Add the time Trump spent on the previous topic
-        const previousTransitionData = transitionArray[transitionIndex - 1];
-        timeOnTopics[previousTransitionData.topic] +=
-          previousTransitionData.end - previousTransitionData.start;
-
-        console.log('Time on topics:', timeOnTopics);
-
-        // Show any new y axis labels
-        barChartYAxis.tickValues(
-          barNames.filter((el, i) => timeOnTopics[i] > 0),
-        );
-        barChartYAxisGroup.call(barChartYAxis);
-
-        // Update the data in our bar chart
-        const topicBars = timeOnTopicBarGroup
-          .selectAll('rect')
-          .data(timeOnTopics);
-
-        topicBars
-          .enter()
-          .append('rect')
-          .classed('bar', true)
-          .merge(topicBars)
-          .attr('width', d => barChartXScale(d))
-          .attr('height', barChartYScale.bandwidth())
-          .attr('y', (d, i) => barChartYScale(barNames[i]))
-          .attr('x', barChartXPadding);
-
-        topicBars.exit().remove();
 
         // Reveal our lines between topics as soon as we've moved onto the
         // next topic
@@ -501,15 +526,6 @@ function renderChart(width) {
       .ease(d3.easeLinear)
       .duration(1000 * (t.end - numSecondsElapsed))
       .attr('y', yScale(t.end) - trumpImageHeight / 2);
-
-    // Add text for the topic Trump just moved to
-    chartGroup
-      .append('text')
-      .text(barNames[t.topic])
-      .attr('y', yScale(t.start) - 40)
-      .attr('x', xScale(barNames[t.topic]))
-      .attr('text-anchor', 'start')
-      .classed('topics', true);
 
     // For each of the paths we created earlier, create a transition that
     // slowly exposes the line over the duration of the topic
