@@ -109,3 +109,7 @@ p {
 #footer a {
   margin-right: 40px;
 }
+
+.currentTopic {
+  fill: #484848;
+}
