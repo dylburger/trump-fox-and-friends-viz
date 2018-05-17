@@ -18,15 +18,29 @@ h1 {
   font-family: 'PT Serif', serif;
 }
 
-#barChart {
+#header {
   position: fixed;
   top: 0;
+  clear: both;
   width: 100%;
-  z-index: 4;
-  margin-top: 40px;
+  height: auto;
+  padding-top: 20px;
 }
 
-#barChart svg {
+#introText {
+  background: #ffffff;
+}
+
+#barChart {
+  display: none;
+}
+
+#app {
+  margin: 200px auto 0;
+  height: 100%;
+}
+
+#header svg {
   float: right;
 }
 

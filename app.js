@@ -18,7 +18,6 @@ const barNames = [
 
 // Generate empty bars for each topic Trump discusses
 const timeOnTopics = barNames.map(topic => 0);
-let topicBarTransitions = null;
 
 const TIMER_INTERVAL_MS = 100;
 let numSecondsElapsed = 0;
@@ -235,6 +234,8 @@ const yAxisGroup = chartGroup.append('g').attr('class', 'axis');
 const barChartSVG = d3.select('#barChart').append('svg');
 const barChartGroup = barChartSVG.append('g');
 
+let topicBarTransitions = barChartGroup.selectAll('rect');
+
 const barChartYScale = d3
   .scaleBand()
   .domain(barNames)
@@ -294,7 +295,7 @@ function renderChart(width) {
 
   // Render the bar chart
   const barChartWidth = chartWidth / 2;
-  const barChartHeight = '400';
+  const barChartHeight = '300';
   const barChartLeftMargin = barChartWidth / 2;
   const barChartXPadding = 10;
 
@@ -601,6 +602,12 @@ function renderChart(width) {
   };
 
   const handlePlayOrPauseStateChanges = eventType => {
+    // Remove the intro text under any condition
+    d3.select('#introText').remove();
+
+    // Display the bar chart
+    d3.select('#barChart').style('display', 'block');
+
     const scrollTransition = d3
       .transition('scroll')
       .ease(d3.easeLinear)
