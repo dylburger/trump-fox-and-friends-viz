@@ -12,7 +12,7 @@ const barNames = [
   'Justice Department',
   'Witch Hunt',
   'FBI',
-  'Paul Manafort',
+  'Manafort',
   'Cohen',
 ];
 
