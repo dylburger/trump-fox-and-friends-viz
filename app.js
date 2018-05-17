@@ -531,38 +531,30 @@ function renderChart(width) {
       .append('rect')
       .classed('bar', true)
       .merge(topicBars)
-      .attr('width', (d, i) => {
-        let initialWidth = 0;
-        if (i === t.topic) {
-          initialWidth = d + numSecondsElapsedSinceLastTransition;
-        } else {
-          initialWidth = d;
-        }
-        if (i === t.topic) console.log('Initial width:', initialWidth);
-        return barChartXScale(initialWidth);
-      })
+      .attr(
+        'width',
+        (d, i) =>
+          i === t.topic
+            ? barChartXScale(d + numSecondsElapsedSinceLastTransition)
+            : barChartXScale(d),
+      )
       .attr('height', barChartYScale.bandwidth())
       .attr('y', (d, i) => barChartYScale(barNames[i]))
       .attr('x', barChartXPadding)
       .classed('currentTopic', (d, i) => (i === t.topic ? true : false))
       .transition()
       .ease(d3.easeLinear)
-      .duration((d, i) => {
-        const duration =
-          1000 * (t.end - t.start - numSecondsElapsedSinceLastTransition);
-        if (i === t.topic) console.log('Duration:', duration);
-        return duration;
-      })
-      .attr('width', (d, i) => {
-        let finalWidth = 0;
-        if (i === t.topic) {
-          finalWidth = d + t.end - t.start;
-        } else {
-          finalWidth = d;
-        }
-        if (i === t.topic) console.log('Final width:', finalWidth);
-        return barChartXScale(finalWidth);
-      });
+      .duration(
+        (d, i) =>
+          1000 * (t.end - t.start - numSecondsElapsedSinceLastTransition),
+      )
+      .attr(
+        'width',
+        (d, i) =>
+          i === t.topic
+            ? barChartXScale(d + t.end - t.start)
+            : barChartXScale(d),
+      );
 
     topicBars.exit().remove();
   }
