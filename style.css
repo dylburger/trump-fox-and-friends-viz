@@ -36,12 +36,17 @@ h1 {
 }
 
 #app {
-  margin: 200px auto 0;
+  margin: 400px auto 0;
   height: 100%;
+}
+
+#app svg {
+  padding-right: 50px;
 }
 
 #header svg {
   float: right;
+  margin-right: 10px;
 }
 
 #pausePlayButton {

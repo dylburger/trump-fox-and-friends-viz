@@ -231,7 +231,10 @@ const yAxis = d3
 const yAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
 // Bar chart SVG to show time spent on topics
-const barChartSVG = d3.select('#barChart').append('svg');
+const barChartSVG = d3
+  .select('#barChart')
+  .append('svg')
+  .style('background-color', '#ffffff');
 const barChartGroup = barChartSVG.append('g');
 
 let topicBarTransitions = barChartGroup.selectAll('rect');
@@ -294,10 +297,11 @@ function renderChart(width) {
   yAxisGroup.select('path').attr('stroke', '#fff');
 
   // Render the bar chart
-  const barChartWidth = chartWidth / 2;
+  const barChartWidth = chartWidth / 2 + 100;
   const barChartHeight = '300';
   const barChartLeftMargin = barChartWidth / 2;
   const barChartXPadding = 10;
+  const barChartRightMargin = 10;
 
   barChartSVG.attr('width', barChartWidth).attr('height', barChartHeight);
   barChartGroup
@@ -306,7 +310,10 @@ function renderChart(width) {
     .attr('transform', `translate(${barChartLeftMargin})`);
 
   barChartYScale.range([0, barChartHeight]);
-  barChartXScale.range([0, barChartLeftMargin - barChartXPadding]);
+  barChartXScale.range([
+    0,
+    barChartWidth - barChartLeftMargin - barChartXPadding - barChartRightMargin,
+  ]);
 
   barChartYAxisGroup.call(barChartYAxis);
   barChartYAxisGroup.select('path').attr('stroke', '#fff');
