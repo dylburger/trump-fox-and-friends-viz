@@ -18,9 +18,13 @@ const barNames = [
 
 // Generate empty bars for each topic Trump discusses
 const timeOnTopics = barNames.map(topic => 0);
+let topicBarTransitions = null;
 
+const TIMER_INTERVAL_MS = 100;
 let numSecondsElapsed = 0;
 let numSecondsElapsedTimer = null;
+let numSecondsElapsedSinceLastTransition = 0;
+let numSecondsElapsedSinceLastTransitionTimer = null;
 
 // We increment the tangent count for each new topic Trump talks about,
 // but the first topic isn't a tangent (it's tied to the question).
@@ -430,6 +434,7 @@ function renderChart(width) {
     console.log('Tangent count:', tangentCount);
 
     if (userPausedAudio === false) {
+      numSecondsElapsedSinceLastTransition = 0;
       console.log('Transition index:', transitionIndex);
       tangentCount += 1;
       tangentTallySpan.text(tangentCount);
@@ -443,7 +448,8 @@ function renderChart(width) {
         previousTransitionData.end - previousTransitionData.start;
 
       // And for brand new topics, start him with a little bit of time
-      // so that we show the topic name on the y axis below
+      // so that we reveal the topic name on the y axis below (revealing
+      // the name requires we have some data attached to the bar)
       if (timeOnTopics[t.topic] === 0) {
         timeOnTopics[t.topic] += 0.01;
       }
@@ -451,34 +457,6 @@ function renderChart(width) {
       // Show any new y axis labels
       barChartYAxis.tickValues(barNames.filter((el, i) => timeOnTopics[i] > 0));
       barChartYAxisGroup.call(barChartYAxis);
-
-      // Update the data in our bar chart
-      const topicBars = timeOnTopicBarGroup
-        .selectAll('rect')
-        .data(timeOnTopics);
-
-      topicBars
-        .enter()
-        .append('rect')
-        .classed('bar', true)
-        .merge(topicBars)
-        .attr('width', d => barChartXScale(d))
-        .attr('height', barChartYScale.bandwidth())
-        .attr('y', (d, i) => barChartYScale(barNames[i]))
-        .attr('x', barChartXPadding)
-        .classed('currentTopic', (d, i) => (i === t.topic ? true : false))
-        .transition()
-        .ease(d3.easeLinear)
-        .duration(1000 * (t.end - numSecondsElapsed))
-        .attr(
-          'width',
-          (d, i) =>
-            i === t.topic
-              ? barChartXScale(t.end - numSecondsElapsed + d)
-              : barChartXScale(d),
-        );
-
-      topicBars.exit().remove();
 
       // Add text for the topic Trump just moved to
       chartGroup
@@ -537,6 +515,56 @@ function renderChart(width) {
       .duration(1000 * (t.end - numSecondsElapsed))
       .attr('stroke-dashoffset', 0)
       .on('end', () => runTransitions(transitionArray, transitionIndex + 1));
+
+    // Update the data in our bar chart
+    const topicBars = timeOnTopicBarGroup.selectAll('rect').data(timeOnTopics);
+
+    console.log(
+      'Num seconds since last transition:',
+      numSecondsElapsedSinceLastTransition,
+    );
+
+    console.log('Time on topics:', timeOnTopics);
+
+    topicBarTransitions = topicBars
+      .enter()
+      .append('rect')
+      .classed('bar', true)
+      .merge(topicBars)
+      .attr('width', (d, i) => {
+        let initialWidth = 0;
+        if (i === t.topic) {
+          initialWidth = d + numSecondsElapsedSinceLastTransition;
+        } else {
+          initialWidth = d;
+        }
+        if (i === t.topic) console.log('Initial width:', initialWidth);
+        return barChartXScale(initialWidth);
+      })
+      .attr('height', barChartYScale.bandwidth())
+      .attr('y', (d, i) => barChartYScale(barNames[i]))
+      .attr('x', barChartXPadding)
+      .classed('currentTopic', (d, i) => (i === t.topic ? true : false))
+      .transition()
+      .ease(d3.easeLinear)
+      .duration((d, i) => {
+        const duration =
+          1000 * (t.end - t.start - numSecondsElapsedSinceLastTransition);
+        if (i === t.topic) console.log('Duration:', duration);
+        return duration;
+      })
+      .attr('width', (d, i) => {
+        let finalWidth = 0;
+        if (i === t.topic) {
+          finalWidth = d + t.end - t.start;
+        } else {
+          finalWidth = d;
+        }
+        if (i === t.topic) console.log('Final width:', finalWidth);
+        return barChartXScale(finalWidth);
+      });
+
+    topicBars.exit().remove();
   }
 
   function pauseTransitions(transitionArray, transitionIndex) {
@@ -553,6 +581,9 @@ function renderChart(width) {
     paths[transitionIndex].transition().duration(0);
 
     pauseTransitions(transitionArray, transitionIndex + 1);
+
+    // Pause transitions for bars in bar chart
+    topicBarTransitions.nodes().forEach(node => d3.interrupt(node));
   }
 
   // Should we pause or play?
@@ -593,7 +624,12 @@ function renderChart(width) {
       // Increment the number of seconds that have elapsed since clicking play
       numSecondsElapsedTimer = window.setInterval(() => {
         numSecondsElapsed += 0.1;
-      }, 100);
+      }, TIMER_INTERVAL_MS);
+
+      // Increment the number of seconds that have elapsed since the last transition
+      numSecondsElapsedSinceLastTransitionTimer = window.setInterval(() => {
+        numSecondsElapsedSinceLastTransition += 0.1;
+      }, TIMER_INTERVAL_MS);
 
       pausePlayButton
         .attr('src', 'pause.png')
@@ -601,6 +637,7 @@ function renderChart(width) {
       runTransitions(transitions, 0);
     } else {
       window.clearInterval(numSecondsElapsedTimer);
+      window.clearInterval(numSecondsElapsedSinceLastTransitionTimer);
 
       audioNode.pause();
 
