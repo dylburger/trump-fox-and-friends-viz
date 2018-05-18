@@ -298,16 +298,22 @@ function renderChart(width) {
 
   // Render the bar chart
   const barChartWidth = chartWidth / 2 + 100;
-  const barChartHeight = '300';
+  const barChartHeight = 300;
+  const barChartTopMargin = 50;
   const barChartLeftMargin = barChartWidth / 2;
   const barChartXPadding = 10;
   const barChartRightMargin = 10;
 
-  barChartSVG.attr('width', barChartWidth).attr('height', barChartHeight);
+  barChartSVG
+    .attr('width', barChartWidth)
+    .attr('height', barChartHeight + barChartTopMargin);
   barChartGroup
     .attr('width', barChartWidth)
     .attr('height', barChartHeight)
-    .attr('transform', `translate(${barChartLeftMargin})`);
+    .attr(
+      'transform',
+      `translate(${barChartLeftMargin}, ${barChartTopMargin})`,
+    );
 
   barChartYScale.range([0, barChartHeight]);
   barChartXScale.range([
@@ -317,6 +323,15 @@ function renderChart(width) {
 
   barChartYAxisGroup.call(barChartYAxis);
   barChartYAxisGroup.select('path').attr('stroke', '#fff');
+
+  // Add text for the topic Trump just moved to
+  barChartSVG
+    .append('text')
+    .text('Time on Topics')
+    .attr('y', barChartTopMargin - 10)
+    .attr('x', barChartWidth / 2)
+    .attr('text-anchor', 'start')
+    .classed('barChartTitle', true);
 
   // Define the line width for our paths
   const lineWidth = 3;
