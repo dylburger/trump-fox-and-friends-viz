@@ -1,5 +1,5 @@
 body {
-  font-family: 'PT Serif', serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 h1 {
@@ -10,12 +10,47 @@ h1 {
 
 .topics {
   font-size: 30px;
-  font-family: 'PT Serif', serif;
+  font-family: 'Roboto', sans-serif;
+}
+
+.barChartTitle {
+  font-size: 30px;
+  font-family: 'Roboto', sans-serif;
 }
 
 .axis {
   font-size: 24px;
-  font-family: 'PT Serif', serif;
+  font-family: 'Roboto', sans-serif;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  clear: both;
+  width: 100%;
+  height: auto;
+}
+
+#introText {
+  background: #ffffff;
+}
+
+#barChart {
+  display: none;
+}
+
+#app {
+  margin: 400px auto 0;
+  height: 100%;
+}
+
+#app svg {
+  padding-right: 50px;
+}
+
+#header svg {
+  float: right;
+  margin-right: 10px;
 }
 
 #pausePlayButton {
@@ -96,4 +131,8 @@ p {
 
 #footer a {
   margin-right: 40px;
+}
+
+.currentTopic {
+  fill: #ff0000;
 }
