@@ -39,6 +39,10 @@ h1 {
   display: none;
 }
 
+#barChart svg {
+  opacity: 1;
+}
+
 #app {
   margin: 400px auto 0;
   height: 100%;

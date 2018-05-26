@@ -231,10 +231,7 @@ const yAxis = d3
 const yAxisGroup = chartGroup.append('g').attr('class', 'axis');
 
 // Bar chart SVG to show time spent on topics
-const barChartSVG = d3
-  .select('#barChart')
-  .append('svg')
-  .style('background-color', '#ffffff');
+const barChartSVG = d3.select('#barChart').append('svg');
 const barChartGroup = barChartSVG.append('g');
 
 let topicBarTransitions = barChartGroup.selectAll('rect');
