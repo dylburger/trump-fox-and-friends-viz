@@ -21,6 +21,7 @@ h1 {
 .axis {
   font-size: 24px;
   font-family: 'Roboto', sans-serif;
+  stroke-opacity: 0;
 }
 
 #header {
